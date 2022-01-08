@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        imageView2.setOnClickListener {
+        imageView.setOnClickListener {
             openImageChooser()
         }
         button.setOnClickListener {
@@ -62,14 +62,13 @@ class MainActivity : AppCompatActivity() {
             val result = detector.process(image)
                 .addOnSuccessListener { faces ->
                     if (faces.count()>0){
-                        for (face in faces) {
-                            CoroutineScope(Dispatchers.IO).launch {
-                                var bitmap2 = Glide.with(applicationContext).asBitmap().load(selectedImageUri)
-                                    .submit().get()
-                                imageView2.setImageBitmap(drawRect(bitmap2,faces))
-
-                            }
+                        CoroutineScope(Dispatchers.IO).launch {
+                            var bitmap = Glide.with(applicationContext).asBitmap().load(selectedImageUri)
+                                .submit().get()
+                            imageView.setImageBitmap(drawRect(bitmap,faces))
                         }
+                        var faceCount=faces.count()
+                        Toast.makeText(applicationContext,"Found $faceCount Faces",Toast.LENGTH_SHORT).show()
                     }
                     else{
                         Toast.makeText(applicationContext,"No Faces Found",Toast.LENGTH_SHORT).show()
@@ -82,8 +81,6 @@ class MainActivity : AppCompatActivity() {
         else{
             Toast.makeText(applicationContext,"Select an Image",Toast.LENGTH_SHORT).show()
         }
-
-
     }
     private fun openImageChooser() {
         Intent(Intent.ACTION_PICK).also {
@@ -99,12 +96,9 @@ class MainActivity : AppCompatActivity() {
             when (requestCode) {
                 REQUEST_CODE_PICK_IMAGE -> {
                     selectedImageUri = data?.data
-                    imageView2.setImageURI(selectedImageUri)
+                    imageView.setImageURI(selectedImageUri)
                 }
             }
-
         }
     }
-
-
 }
